@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>顏色記憶遊戲</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        #container {
+            margin-top: 50px;
+        }
+        #colorBox {
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            border-radius: 10px;
+            border: 3px solid black;
+            transition: background-color 0.2s ease;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .option {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 150px;
+            border-radius: 5px;
+        }
+        .option:hover {
+            background-color: #0056b3;
+        }
+        #question {
+            margin-top: 20px;
+            display: none;
+        }
+        #userAnswer {
+            font-size: 20px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #timer {
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+    <div id="container">
+        <h1>記住顏色遊戲</h1>
+        <div id="colorBox"></div>
+        <p id="timer">倒數: 1 秒</p>
+        <button onclick="startGame()">開始遊戲</button>
+        
+        <div id="question">
+            <p>剛才出現了什麼顏色？</p>
+            <div id="options"></div>
+        </div>
+        <p id="userAnswer"></p>
+    </div>
+
+    <script>
+        let colors = {
+            "red": "紅色",
+            "blue": "藍色",
+            "green": "綠色",
+            "yellow": "黃色",
+            "purple": "紫色",
+            "orange": "橙色",
+            "pink": "粉紅色",
+            "brown": "棕色",
+            "gray": "灰色",
+            "cyan": "青色",
+            "lime": "萊姆色",
+            "magenta": "洋紅色",
+            "teal": "藍綠色",
+            "gold": "金色",
+            "navy": "深藍色",
+            "coral": "珊瑚色",
+            "olive": "橄欖色",
+            "maroon": "栗色",
+            "turquoise": "青綠色",
+            "violet": "紫羅蘭色",
+            "beige": "米色",
+            "indigo": "靛藍色",
+            "lavender": "薰衣草色",
+            "peach": "桃色",
+            "skyblue": "天藍色"
+        };
+        let displayedColors = [];
+        let correctAnswer = "";
+
+        function startGame() {
+            let timerElement = document.getElementById("timer");
+            let timeLeft = 1; // 1秒倒數
+            timerElement.innerText = "倒數: " + timeLeft + " 秒";
+            let countdown = setInterval(() => {
+                timeLeft -= 0.1;
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    timerElement.innerText = "時間到!";
+                } else {
+                    timerElement.innerText = "倒數: " + timeLeft.toFixed(1) + " 秒";
+                }
+            }, 100);
+            displayedColors = [];
+            document.getElementById("question").style.display = "none";
+            document.getElementById("userAnswer").innerText = "";
+            let box = document.getElementById("colorBox");
+            let totalDuration = 1000;  // 顏色顯示的總時間為 3 秒
+            let flashes = 15; // 顏色閃現的次數
+            let interval = totalDuration / flashes; // 每次顯示顏色的間隔
+
+            let count = 0;
+            let flashInterval = setInterval(() => {
+                if (count >= flashes) {
+                    clearInterval(flashInterval);
+                    box.style.backgroundColor = "white";  // 完成閃現後恢復為白色
+                    correctAnswer = displayedColors[Math.floor(Math.random() * displayedColors.length)];
+                    setTimeout(askQuestion, 1000);  // 閃現完後1秒後出題
+                    return;
+                }
+                let randomColor = Object.keys(colors)[Math.floor(Math.random() * Object.keys(colors).length)];
+                displayedColors.push(randomColor);
+                box.style.backgroundColor = randomColor;
+                count++;
+            }, interval);
+        }
+
+        function askQuestion() {
+            document.getElementById("colorBox").style.backgroundColor = "white";
+            document.getElementById("question").style.display = "block";
+            let optionsContainer = document.getElementById("options");
+            optionsContainer.innerHTML = "";
+            
+            let options = [correctAnswer];
+            let colorKeys = Object.keys(colors);
+            while (options.length < 4) {
+                let randomOption = colorKeys[Math.floor(Math.random() * colorKeys.length)];
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            
+            options.forEach(option => {
+                let btn = document.createElement("button");
+                btn.className = "option";
+                btn.innerText = colors[option];
+                btn.onclick = () => collectAnswer(option);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function collectAnswer(selectedColor) {
+            document.getElementById("userAnswer").innerText = "你選擇了: " + colors[selectedColor];
+        }
+    </script>
+</body>
+</html>
