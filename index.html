@@ -65,6 +65,10 @@
         font-weight: bold;
         margin-top: 10px;
     }
+        .option.selected {
+            background-color: #28a745 !important;
+            color: white;
+        }
 </style>
 </head>
 <body>
@@ -83,32 +87,17 @@
 
     <script>
         let colors = {
-            "red": "紅色",
-            "blue": "藍色",
-            "green": "綠色",
-            "yellow": "黃色",
-            "purple": "紫色",
-            "orange": "橙色",
-            "pink": "粉紅色",
-            "brown": "棕色",
-            "gray": "灰色",
-            "cyan": "青色",
-            "lime": "萊姆色",
-            "magenta": "洋紅色",
-            "teal": "藍綠色",
-            "gold": "金色",
-            "navy": "深藍色",
-            "coral": "珊瑚色",
-            "olive": "橄欖色",
-            "maroon": "栗色",
-            "turquoise": "青綠色",
-            "violet": "紫羅蘭色",
-            "beige": "米色",
-            "indigo": "靛藍色",
-            "lavender": "薰衣草色",
-            "peach": "桃色",
-            "skyblue": "天藍色"
-        };
+    "red": "紅色",
+    "blue": "藍色",
+    "green": "綠色",
+    "yellow": "黃色",
+    "purple": "紫色",
+    "orange": "橙色",
+    "pink": "粉紅色",
+    "brown": "棕色",
+    "gray": "灰色",
+    "cyan": "青色"
+};
         let displayedColors = [];
         let correctAnswer = "";
 
@@ -157,7 +146,7 @@
             
             let options = [correctAnswer];
             let colorKeys = Object.keys(colors);
-            while (options.length < 4) {
+            while (options.length < 6) {
                 let randomOption = colorKeys[Math.floor(Math.random() * colorKeys.length)];
                 if (!options.includes(randomOption)) {
                     options.push(randomOption);
@@ -169,14 +158,28 @@
                 let btn = document.createElement("button");
                 btn.className = "option";
                 btn.innerText = colors[option];
-                btn.onclick = () => collectAnswer(option);
+                btn.onclick = () => {
+                    btn.classList.toggle("selected");
+                };
                 optionsContainer.appendChild(btn);
             });
+
+            let submit = document.createElement("button");
+            submit.innerText = "提交答案";
+            submit.className = "option";
+            submit.onclick = () => {
+                let selected = Array.from(document.querySelectorAll(".option.selected"))
+    .filter(btn => btn.innerText !== "提交答案")
+    .map(btn => Object.keys(colors).find(key => colors[key] === btn.innerText));
+                collectAnswer(selected);
+            };
+            optionsContainer.appendChild(submit);
         }
 
-        function collectAnswer(selectedColor) {
-            document.getElementById("userAnswer").innerText = "你選擇了: " + colors[selectedColor];
-        }
+        function collectAnswer(selectedColors) {
+    let userAnswerText = selectedColors.map(color => colors[color]).join("、");
+    document.getElementById("userAnswer").innerText = "你選擇了: " + userAnswerText;
+}
     </script>
 </body>
 </html>
